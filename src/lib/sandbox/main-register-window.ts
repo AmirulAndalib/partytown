@@ -1,9 +1,9 @@
 import { debug } from '../utils';
 import { logMain, normalizedWinId } from '../log';
 import {
-  MainWindow,
-  PartytownWebWorker,
-  WinId,
+  type MainWindow,
+  type PartytownWebWorker,
+  type WinId,
   WorkerMessageType,
   LocationUpdateType,
 } from '../types';
@@ -57,19 +57,17 @@ export const registerWindow = (
 
     const onLocationChange =
       (type: LocationUpdateType, state: object, newUrl?: string, oldUrl?: string) => () => {
-        setTimeout(() => {
-          worker.postMessage([
-            WorkerMessageType.LocationUpdate,
-            {
-              $winId$,
-              type,
-              state,
-              url: doc.baseURI,
-              newUrl,
-              oldUrl,
-            },
-          ]);
-        });
+        worker.postMessage([
+          WorkerMessageType.LocationUpdate,
+          {
+            $winId$,
+            type,
+            state,
+            url: doc.baseURI,
+            newUrl,
+            oldUrl,
+          },
+        ]);
       };
 
     history.pushState = (state, _, newUrl) => {

@@ -13,10 +13,10 @@ import { HTMLSrcElementDescriptorMap } from './worker-src-element';
 import { setInstanceStateValue, getInstanceStateValue } from './worker-state';
 import {
   StateProp,
-  WebWorkerEnvironment,
-  WorkerInstance,
+  type WebWorkerEnvironment,
+  type WorkerInstance,
   WorkerMessageType,
-  WorkerNode,
+  type WorkerNode,
 } from '../types';
 
 export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement: any, env: WebWorkerEnvironment) => {
@@ -57,6 +57,7 @@ export const patchHTMLIFrameElement = (WorkerHTMLIFrameElement: any, env: WebWor
 
           env.$location$.href = src = resolveUrl(env, src, 'iframe');
           env.$isLoading$ = 1;
+          env.$isSameOrigin$ = webWorkerCtx.$origin$ === env.$location$.origin;
 
           setInstanceStateValue(this, StateProp.loadErrorStatus, undefined);
 

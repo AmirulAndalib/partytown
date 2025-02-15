@@ -3,16 +3,15 @@ import {
   getConstructorName,
   getNodeName,
   isValidMemberName,
-  len,
   noop,
+  serializeConfig,
 } from '../utils';
 import { config, docImpl, libPath, mainWindow } from './main-globals';
 import {
   InterfaceType,
-  InterfaceInfo,
-  InterfaceMember,
-  InitWebWorkerData,
-  StorageItem,
+  type InterfaceInfo,
+  type InterfaceMember,
+  type InitWebWorkerData,
 } from '../types';
 
 export const readMainPlatform = () => {
@@ -61,23 +60,14 @@ export const readMainPlatform = () => {
     readImplementation('Node', textNode),
   ];
 
-  const $config$ = JSON.stringify(config, (k, v) => {
-    if (typeof v === 'function') {
-      v = String(v);
-      if (v.startsWith(k + '(')) {
-        v = 'function ' + v;
-      }
-    }
-    return v;
-  });
+  const $config$ = serializeConfig(config);
 
   const initWebWorkerData: InitWebWorkerData = {
     $config$,
     $interfaces$: readImplementations(impls, initialInterfaces),
     $libPath$: new URL(libPath, mainWindow.location as any) + '',
     $origin$: origin,
-    $localStorage$: readStorage('localStorage'),
-    $sessionStorage$: readStorage('sessionStorage'),
+    $tabId$: mainWindow._pttab,
   };
 
   addGlobalConstructorUsingPrototype(
@@ -94,7 +84,15 @@ export const readMainInterfaces = () => {
   // and create each element to get their implementation
   const elms = Object.getOwnPropertyNames(mainWindow)
     .map((interfaceName) => createElementFromConstructor(docImpl, interfaceName))
-    .filter((elm) => elm)
+    .filter((elm) => {
+      if (!elm) {
+        return false;
+      }
+      const constructorName = getConstructorName(elm);
+      return !(
+        constructorName === 'HTMLUnknownElement' && elm.nodeName.toUpperCase() !== 'UNKNOWN'
+      );
+    })
     .map((elm) => [elm]);
 
   return readImplementations(elms, []);
@@ -191,18 +189,6 @@ const readImplementationMember = (
   } catch (e) {
     console.warn(e);
   }
-};
-
-const readStorage = (storageName: 'localStorage' | 'sessionStorage') => {
-  let items: StorageItem[] = [];
-  let i = 0;
-  let l = len(mainWindow[storageName]);
-  let key: string;
-  for (; i < l; i++) {
-    key = mainWindow[storageName].key(i)!;
-    items.push([key, mainWindow[storageName].getItem(key)!]);
-  }
-  return items;
 };
 
 const getGlobalConstructor = (mainWindow: any, cstrName: string) =>

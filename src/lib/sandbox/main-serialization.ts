@@ -2,14 +2,14 @@ import { getConstructorName, getNodeName, isValidMemberName, startsWith } from '
 import { getInstance, getAndSetInstanceId } from './main-instances';
 import { mainRefs } from './main-constants';
 import {
-  PartytownWebWorker,
-  SerializedCSSRule,
-  SerializedInstance,
-  SerializedObject,
-  SerializedRefTransferData,
-  SerializedTransfer,
+  type PartytownWebWorker,
+  type SerializedCSSRule,
+  type SerializedInstance,
+  type SerializedObject,
+  type SerializedRefTransferData,
+  type SerializedTransfer,
   SerializedType,
-  WinId,
+  type WinId,
   WorkerMessageType,
 } from '../types';
 
@@ -127,9 +127,10 @@ const serializeCssRuleForWorker = (cssRule: any) => {
   }
   return obj;
 };
-
+let ErrorObject: any = null;
 const serializedValueIsError = (value: any) => {
-  return value instanceof (window.top as any).Error;
+  ErrorObject = (window.top as any)?.Error || ErrorObject;
+  return value instanceof ErrorObject;
 };
 
 export const deserializeFromWorker = (

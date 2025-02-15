@@ -3,9 +3,8 @@ import {
   CallType,
   NodeName,
   StateProp,
-  WebWorkerEnvironment,
-  WinDocId,
-  WorkerNode,
+  type WebWorkerEnvironment,
+  type WorkerNode,
 } from '../types';
 import {
   cachedProps,
@@ -14,13 +13,12 @@ import {
   getOrCreateNodeInstance,
 } from './worker-constructors';
 import { createEnvironment } from './worker-environment';
-import { createWindow } from './worker-window';
 import { debug, definePrototypePropertyDescriptor, randomId, SCRIPT_TYPE } from '../utils';
 import { ABOUT_BLANK, elementStructurePropNames, IS_TAG_REG, WinIdKey } from './worker-constants';
 import { getInstanceStateValue } from './worker-state';
 import { getPartytownScript } from './worker-exec';
 import { isScriptJsType } from './worker-script';
-import { warnCrossOrgin } from '../log';
+import { warnCrossOrigin } from '../log';
 
 export const patchDocument = (
   WorkerDocument: any,
@@ -39,7 +37,7 @@ export const patchDocument = (
         if (env.$isSameOrigin$) {
           return getter(this, ['cookie']);
         } else {
-          warnCrossOrgin('get', 'cookie', env);
+          warnCrossOrigin('get', 'cookie', env);
           return '';
         }
       },
@@ -47,7 +45,7 @@ export const patchDocument = (
         if (env.$isSameOrigin$) {
           setter(this, ['cookie'], value);
         } else if (debug) {
-          warnCrossOrgin('set', 'cookie', env);
+          warnCrossOrigin('set', 'cookie', env);
         }
       },
     },
@@ -172,6 +170,12 @@ export const patchDocument = (
     images: {
       get() {
         return getter(this, ['images']);
+      },
+    },
+
+    scripts: {
+      get() {
+        return getter(this, ['scripts']);
       },
     },
 

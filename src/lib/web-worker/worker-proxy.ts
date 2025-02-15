@@ -1,19 +1,19 @@
 import {
-  ApplyPath,
+  type ApplyPath,
   ApplyPathType,
-  AssignInstanceId,
-  CallMethod,
+  type AssignInstanceId,
+  type CallMethod,
   CallType,
-  ConstructGlobal,
-  Getter,
-  HookOptions,
-  MainAccessRequest,
-  MainAccessResponse,
-  MainAccessTask,
-  Setter,
+  type ConstructGlobal,
+  type Getter,
+  type HookOptions,
+  type MainAccessRequest,
+  type MainAccessResponse,
+  type MainAccessTask,
+  type Setter,
   WorkerMessageType,
-  WorkerInstance,
-  WorkerNode,
+  type WorkerInstance,
+  type WorkerNode,
 } from '../types';
 import {
   ApplyPathKey,
@@ -107,7 +107,7 @@ export const sendToMain = (isBlocking?: boolean) => {
 
     const endTask = taskQueue[len(taskQueue) - 1];
     const accessReq: MainAccessRequest = {
-      $msgId$: randomId(),
+      $msgId$: `${randomId()}.${webWorkerCtx.$tabId$}`,
       $tasks$: [...taskQueue],
     };
     taskQueue.length = 0;

@@ -1,18 +1,18 @@
 import {
-  ApplyPath,
+  type ApplyPath,
   CallType,
-  InstanceId,
-  RefHandlerCallbackData,
-  RefId,
-  SerializedAttr,
-  SerializedInstance,
-  SerializedObject,
-  SerializedRefTransferData,
-  SerializedTransfer,
+  type InstanceId,
+  type RefHandlerCallbackData,
+  type RefId,
+  type SerializedAttr,
+  type SerializedInstance,
+  type SerializedObject,
+  type SerializedRefTransferData,
+  type SerializedTransfer,
   SerializedType,
-  WebWorkerEnvironment,
-  WinId,
-  WorkerNode,
+  type WebWorkerEnvironment,
+  type WinId,
+  type WorkerNode,
 } from '../types';
 import { callMethod } from './worker-proxy';
 import {
@@ -226,12 +226,19 @@ export const getOrCreateSerializedInstance = ([
   winId,
   instanceId,
   nodeName,
-  prevInstanceId
+  prevInstanceId,
 ]: SerializedInstance): any => {
   if (instanceId === winId && environments[winId]) {
     return environments[winId].$window$;
   } else {
-    return getOrCreateNodeInstance(winId, instanceId, nodeName!, undefined, undefined, prevInstanceId);
+    return getOrCreateNodeInstance(
+      winId,
+      instanceId,
+      nodeName!,
+      undefined,
+      undefined,
+      prevInstanceId
+    );
   }
 };
 

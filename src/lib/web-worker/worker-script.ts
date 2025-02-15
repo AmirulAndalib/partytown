@@ -1,9 +1,9 @@
-import { definePrototypePropertyDescriptor } from '../utils';
+import { definePrototypePropertyDescriptor, testIfMustLoadScriptOnMainThread } from '../utils';
 import { getInstanceStateValue, setInstanceStateValue } from './worker-state';
 import { getter, setter } from './worker-proxy';
 import { HTMLSrcElementDescriptorMap } from './worker-src-element';
 import { resolveUrl } from './worker-exec';
-import { StateProp, WebWorkerEnvironment, WorkerNode } from '../types';
+import { StateProp, type WebWorkerEnvironment, type WorkerNode } from '../types';
 import { webWorkerCtx } from './worker-constants';
 
 export const patchHTMLScriptElement = (WorkerHTMLScriptElement: any, env: WebWorkerEnvironment) => {
@@ -26,10 +26,8 @@ export const patchHTMLScriptElement = (WorkerHTMLScriptElement: any, env: WebWor
           setter(this, ['dataset', 'ptsrc'], orgUrl);
         }
 
-        if (this.type && config.loadScriptsOnMainThread) {
-          const shouldExecuteScriptViaMainThread = config.loadScriptsOnMainThread.some(
-            (scriptUrl) => scriptUrl === url
-          );
+        if (this.type) {
+          const shouldExecuteScriptViaMainThread = testIfMustLoadScriptOnMainThread(config, url);
 
           if (shouldExecuteScriptViaMainThread) {
             setter(this, ['type'], 'text/javascript');
@@ -37,6 +35,8 @@ export const patchHTMLScriptElement = (WorkerHTMLScriptElement: any, env: WebWor
         }
       },
     },
+
+    text: innerHTMLDescriptor,
 
     textContent: innerHTMLDescriptor,
 
@@ -61,11 +61,15 @@ export const patchHTMLScriptElement = (WorkerHTMLScriptElement: any, env: WebWor
 const innerHTMLDescriptor: PropertyDescriptor & ThisType<WorkerNode> = {
   get() {
     const type = getter(this, ['type']);
+
     if (isScriptJsType(type)) {
-      return getInstanceStateValue<string>(this, StateProp.innerHTML) || '';
-    } else {
-      return getter(this, ['innerHTML']);
+      const scriptContent = getInstanceStateValue<string>(this, StateProp.innerHTML);
+      if (scriptContent) {
+        return scriptContent;
+      }
     }
+
+    return getter(this, ['innerHTML']) || '';
   },
   set(scriptContent: string) {
     setInstanceStateValue(this, StateProp.innerHTML, scriptContent);

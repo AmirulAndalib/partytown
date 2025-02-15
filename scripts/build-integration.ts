@@ -1,4 +1,4 @@
-import { BuildOptions, submodulePackageJson } from './utils.js';
+import { type BuildOptions, submodulePackageJson } from './utils.js';
 import { join } from 'node:path';
 import type { OutputOptions, RollupOptions } from 'rollup';
 import fsExtra from 'fs-extra';
@@ -14,6 +14,11 @@ export function buildIntegration(opts: BuildOptions): RollupOptions {
     {
       file: join(opts.distIntegrationDir, 'index.mjs'),
       format: 'es',
+    },
+    {
+      file: join(opts.testsDir, 'integrations', 'load-scripts-on-main-thread', 'snippet.js'),
+      format: 'umd',
+      name: 'partytownIntegration',
     },
   ];
 
@@ -45,7 +50,7 @@ export function buildIntegration(opts: BuildOptions): RollupOptions {
         },
       },
       submodulePackageJson(
-        '@builder.io/partytown/integration',
+        '@qwik.dev/partytown/integration',
         opts.srcIntegrationDir,
         opts.distIntegrationDir,
         opts

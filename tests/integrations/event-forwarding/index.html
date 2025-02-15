@@ -8,7 +8,12 @@
 
     <script>
       partytown = {
-        forward: ['superDuperFunction', 'superArray.push','KiwiSizing'],
+        forward: [
+          'superDuperFunction',
+          'superArray.push',
+          'KiwiSizing',
+          ['superPreservedArray.unshift', { preserveBehavior: true }],
+        ],
         logCalls: true,
         logGetters: true,
         logSetters: true,
@@ -21,6 +26,7 @@
     <script>
       superDuperFunction('fnReady');
       superArray.push('arrayReady');
+      superPreservedArray.unshift('arrayReady');
     </script>
 
     <script type="text/partytown">
@@ -30,13 +36,16 @@
         const testFn = document.getElementById('testFn');
 
         superDuperFunction = function() {
+          const testFnInner = document.getElementById('testFnInner');
           switch (arguments[0]) {
             case 'fnReady': {
               testFn.textContent = arguments[0];
+              testFnInner.textContent = arguments[0];
               break;
             }
             case 'testForwardEvent': {
               testFn.textContent = arguments[1] + (++inc);
+              testFnInner.textContent = arguments[1] + (inc);
               break;
             }
           }
@@ -50,9 +59,34 @@
 
         superArray = [];
         superArray.push = function() {
+          const testArrayInner = document.getElementById('testArrayInner');
           switch (arguments[0]) {
             case 'arrayReady': {
               testArray.textContent = arguments[0];
+              testArrayInner.textContent = arguments[0];
+              break;
+            }
+            default: {
+              testArray.textContent = JSON.stringify(arguments[0]);
+              testArrayInner.textContent = JSON.stringify(arguments[0]);
+              break;
+            }
+          }
+        }
+      })();
+    </script>
+
+    <script type="text/partytown">
+      (function() {
+        const testArray = document.getElementById('testPreservedArray');
+        const label = document.getElementById('testPreservedArrayReturnValue');
+
+        superPreservedArray = [];
+        superPreservedArray.unshift = function() {
+          switch (arguments[0]) {
+            case 'arrayReady': {
+              testArray.textContent = arguments[0];
+              label.textContent = 1;
               break;
             }
             default: {
@@ -64,7 +98,7 @@
       })();
     </script>
 
-    <script type='text/partytown'>
+    <script type="text/partytown">
       (function () {
         window.KiwiSizing = window.KiwiSizing === undefined ? {} : window.KiwiSizing;
         KiwiSizing.data = {
@@ -78,9 +112,9 @@
     <script type="text/partytown">
       console.log("KiwiSizing", KiwiSizing)
       console.log("KiwiSizing.data", KiwiSizing.data)
-      window.document.getElementById("kiwisizing").innerText = KiwiSizing.data;
+      window.document.getElementById("kiwisizing").innerText = JSON.stringify(KiwiSizing.data);
     </script>
-      <style>
+    <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif,
           Apple Color Emoji, Segoe UI Emoji;
@@ -112,6 +146,7 @@
       }
       li strong,
       li code,
+      li span,
       li button {
         white-space: nowrap;
         flex: 1;
@@ -126,6 +161,7 @@
         <strong>fn event</strong>
         <button id="buttonForwardEvent">fn</button>
         <code id="testFn"></code>
+        <code id="testFnInner"></code>
         <script>
           (function () {
             const btn = document.getElementById('buttonForwardEvent');
@@ -140,12 +176,31 @@
         <strong>array push event</strong>
         <button id="buttonArrayPush">push</button>
         <code id="testArray"></code>
+        <code id="testArrayInner"></code>
         <script>
           (function () {
             let mph = 88;
             const btn = document.getElementById('buttonArrayPush');
             btn.addEventListener('click', function (ev) {
               superArray.push({ mph: mph++ });
+            });
+          })();
+        </script>
+      </li>
+      <li>
+        <strong>array unshift event with preserve behavior</strong>
+        <button id="buttonPreservedArrayPush">unshift</button>
+        <span>
+          <code id="testPreservedArray"></code>
+          <code id="testPreservedArrayReturnValue"></code>
+        </span>
+        <script>
+          (function () {
+            let mph = 88;
+            const btn = document.getElementById('buttonPreservedArrayPush');
+            const label = document.getElementById('testPreservedArrayReturnValue');
+            btn.addEventListener('click', function (ev) {
+              label.textContent = superPreservedArray.unshift({ mph: mph++ });
             });
           })();
         </script>

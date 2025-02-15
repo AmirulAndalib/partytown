@@ -4,7 +4,6 @@ import type {
   PostMessageData,
   RefHandler,
   RefId,
-  StorageItem,
   WebWorkerContext,
   WebWorkerEnvironment,
   WinId,
@@ -27,10 +26,6 @@ export const postMessages: PostMessageData[] = [];
 
 export const webWorkerCtx: WebWorkerContext = {} as any;
 export const webWorkerInterfaces: InterfaceInfo[] = [];
-
-export const webWorkerlocalStorage = /*#__PURE__*/ new Map<string, StorageItem[]>();
-export const webWorkerSessionStorage = /*#__PURE__*/ new Map<string, StorageItem[]>();
-
 export const environments: { [winId: WinId]: WebWorkerEnvironment } = {};
 
 export const cachedDimensions = /*#__PURE__*/ new Map<string, any>();
@@ -65,7 +60,7 @@ export const structureChangingMethodNames = /*#__PURE__*/ commaSplit(
 
 /** setters that could change dimensions of elements */
 export const dimensionChangingSetterNames = /*#__PURE__*/ commaSplit(
-  'className,width,height,hidden,innerHTML,innerText,textContent'
+  'className,width,height,hidden,innerHTML,innerText,textContent,text'
 );
 
 /** method calls that could change dimensions of elements */

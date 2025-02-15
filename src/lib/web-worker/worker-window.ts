@@ -1,17 +1,17 @@
 import { addStorageApi } from './worker-storage';
 import {
-  ApplyPath,
+  type ApplyPath,
   CallType,
-  InstanceId,
+  type InstanceId,
   InterfaceType,
   NodeName,
-  WebWorkerEnvironment,
+  type WebWorkerEnvironment,
   WinDocId,
-  WinId,
-  WorkerInstance,
-  WorkerNode,
-  WorkerNodeConstructors,
-  WorkerWindow,
+  type WinId,
+  type WorkerInstance,
+  type WorkerNode,
+  type WorkerNodeConstructors,
+  type WorkerWindow,
 } from '../types';
 import {
   ABOUT_BLANK,
@@ -25,8 +25,6 @@ import {
   NamespaceKey,
   postMessages,
   webWorkerCtx,
-  webWorkerlocalStorage,
-  webWorkerSessionStorage,
   WinIdKey,
 } from './worker-constants';
 import { createCustomElementRegistry } from './worker-custom-elements';
@@ -111,7 +109,7 @@ export const createWindow = (
       this[ApplyPathKey] = applyPath || [];
       this[InstanceDataKey] = instanceData || cstrNodeName;
       this[NamespaceKey] = namespace || cstrNamespace;
-      this[InstanceStateKey] = cstrPrevInstance && cstrPrevInstance[InstanceStateKey] || {};
+      this[InstanceStateKey] = (cstrPrevInstance && cstrPrevInstance[InstanceStateKey]) || {};
       cstrInstanceId = cstrNodeName = cstrNamespace = undefined;
     }
   };
@@ -181,7 +179,7 @@ export const createWindow = (
           nodeName: string,
           instanceId: InstanceId,
           namespace?: string,
-          prevInstance?: WorkerNode,
+          prevInstance?: WorkerNode
         ): WorkerNode => {
           if (htmlMedia.includes(nodeName)) {
             initWindowMedia();
@@ -195,7 +193,7 @@ export const createWindow = (
           cstrInstanceId = instanceId;
           cstrNodeName = nodeName;
           cstrNamespace = namespace;
-          cstrPrevInstance = prevInstance
+          cstrPrevInstance = prevInstance;
           return new NodeCstr() as any;
         };
 
@@ -356,6 +354,7 @@ export const createWindow = (
         patchDocumentElementChild(win.HTMLBodyElement, env);
         patchHTMLHtmlElement(win.HTMLHtmlElement, env);
         createCSSStyleSheetConstructor(win, 'CSSStyleSheet');
+        createCSSStyleSheetConstructor(win, 'CSSMediaRule');
 
         definePrototypeNodeType(win.Comment, 8);
         definePrototypeNodeType(win.DocumentType, 10);
@@ -419,8 +418,8 @@ export const createWindow = (
         win.cancelIdleCallback = (id: number) => clearTimeout(id);
 
         // add storage APIs to the window
-        addStorageApi(win, 'localStorage', webWorkerlocalStorage, $isSameOrigin$, env);
-        addStorageApi(win, 'sessionStorage', webWorkerSessionStorage, $isSameOrigin$, env);
+        addStorageApi(win, 'localStorage', env);
+        addStorageApi(win, 'sessionStorage', env);
 
         if (!$isSameOrigin$) {
           win.indexeddb = undefined;
@@ -463,7 +462,7 @@ export const createWindow = (
         win.Worker = undefined;
       }
 
-      addEventListener(...args: any[]) {
+      addEventListener = (...args: any[]) => {
         if (args[0] === 'load') {
           if (env.$runWindowLoadEvent$) {
             setTimeout(() => args[1]({ type: 'load' }));
@@ -471,7 +470,7 @@ export const createWindow = (
         } else {
           callMethod(this, ['addEventListener'], args, CallType.NonBlocking);
         }
-      }
+      };
 
       get body() {
         return env.$body$;
@@ -589,7 +588,11 @@ export const createWindow = (
               args[1] = resolveUrl(env, args[1], 'xhr');
               (super.open as any)(...args);
             }
-            set withCredentials(_: any) {}
+            set withCredentials(_: boolean) {
+              if (webWorkerCtx.$config$.allowXhrCredentials) {
+                super.withCredentials = _;
+              }
+            }
             toString() {
               return str;
             }

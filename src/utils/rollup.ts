@@ -18,7 +18,7 @@ export interface PartytownRollupOptions {
  * The Rollup plugin will copy Partytown `lib` directory to the given destination,
  * which must be an absolute file path.
  *
- * https://partytown.builder.io/copy-library-files
+ * https://partytown.qwik.dev/copy-library-files
  *
  * @public
  */
@@ -31,9 +31,11 @@ export function partytownRollup(opts?: PartytownRollupOptions) {
       const dir = opts?.dest || (rollupOpts.dir ? join(rollupOpts.dir, '~partytown') : undefined);
 
       if (typeof dir !== 'string') {
-        throw new Error(`A destination directory must be specified either via the Partytown "dest" option or Rollup output dir option.`);
+        throw new Error(
+          `A destination directory must be specified either via the Partytown "dest" option or Rollup output dir option.`
+        );
       }
-    
+
       if (!isAbsolute(dir)) {
         throw new Error(`Partytown plugin "dest" property must be an absolute path.`);
       }
