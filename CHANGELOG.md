@@ -1,5 +1,17 @@
 # @qwik.dev/partytown
 
+## 0.14.3
+
+### Patch Changes
+
+- ✨ automatically execute partytown scripts added to the page after initialization, e.g. on client-side route transitions, without needing to dispatch a `ptupdate` event (by [@gioboa](https://github.com/gioboa) in [#746](https://github.com/QwikDev/partytown/pull/746))
+
+- 🐞🩹 load cross-origin iframes natively when their content can't be fetched, so widgets like the reCAPTCHA badge work instead of crashing with a NetworkError (by [@gioboa](https://github.com/gioboa) in [#749](https://github.com/QwikDev/partytown/pull/749))
+
+- 🐞🩹 partytown scripts added after the main thread fallback ran, e.g. gtm.js injected by the GTM snippet, now fall back too — previously they were silently dropped in webviews without service worker support (by [@gioboa](https://github.com/gioboa) in [#751](https://github.com/QwikDev/partytown/pull/751))
+
+- 🐞🩹 ship `partytown-sandbox-sw.html` as a real library file, so requests that bypass the service worker (crawlers, private browsing, encoded urls) get a 200 instead of a 404 (by [@gioboa](https://github.com/gioboa) in [#750](https://github.com/QwikDev/partytown/pull/750))
+
 ## 0.14.2
 
 ### Patch Changes
