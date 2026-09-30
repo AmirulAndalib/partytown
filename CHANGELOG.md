@@ -1,5 +1,11 @@
 # @qwik.dev/partytown
 
+## 0.14.5
+
+### Patch Changes
+
+- 🐞🩹 define `HTMLCollection` in the web worker so `x instanceof HTMLCollection` no longer throws (e.g. gtag's user-provided-data DOM scan) (by [@gioboa](https://github.com/gioboa) in [#762](https://github.com/QwikDev/partytown/pull/762))
+
 ## 0.14.4
 
 ### Patch Changes
